@@ -7,6 +7,11 @@ interface HeaderProps {
 }
 
 export function Header({ title, subtitle }: HeaderProps) {
+  // Don't render header for home page (empty title)
+  if (!title) {
+    return null;
+  }
+
   return (
     <motion.header
       initial={{ y: -10, opacity: 0 }}

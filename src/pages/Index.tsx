@@ -2,33 +2,28 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   TrendingUp, 
-  Radio, 
-  Cpu, 
-  AlertTriangle,
   CheckCircle2,
-  Zap
+  Zap,
+  Clock
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { MetricCard } from '@/components/dashboard/MetricCard';
 import { ImageUploader } from '@/components/classification/ImageUploader';
-import { IoTSensorPanel } from '@/components/iot/IoTSensorPanel';
-import { ModelComparisonTable } from '@/components/models/ModelComparisonTable';
+import { HomePage } from '@/components/home/HomePage';
 import { 
   WasteDistributionChart, 
   AccuracyTrendChart, 
-  FillLevelTrendChart,
   RecyclabilityChart
 } from '@/components/charts/WasteCharts';
-import { useModelMetrics, useClassificationHistory, useSensorReadings } from '@/hooks/use-dashboard-data';
+import { useModelMetrics, useClassificationHistory } from '@/hooks/use-dashboard-data';
 import { WASTE_CATEGORIES } from '@/lib/waste-categories';
-import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDistanceToNow } from 'date-fns';
 
 const TAB_TITLES: Record<string, { title: string; subtitle: string }> = {
-  dashboard: { title: 'Dashboard', subtitle: 'Real-time waste management analytics' },
-  classify: { title: 'Image Classification', subtitle: 'AI-powered waste image analysis' },
-  iot: { title: 'IoT Monitoring', subtitle: 'Real-time smart bin monitoring' },
-  analytics: { title: 'Analytics', subtitle: 'Comprehensive waste insights' },
-  models: { title: 'Model Management', subtitle: 'Model performance comparison' },
+  home: { title: 'Home', subtitle: 'Welcome to WasteAI' },
+  dashboard: { title: 'Dashboard', subtitle: 'Classification analytics and insights' },
+  classify: { title: 'Image Classification', subtitle: 'Upload and classify waste images' },
 };
 
 // Mock data for charts
@@ -41,35 +36,23 @@ const accuracyTrendData = [
   { date: 'Jun', accuracy: 96 },
 ];
 
-const fillLevelData = [
-  { time: '00:00', zone_a: 20, zone_b: 35, zone_c: 15 },
-  { time: '04:00', zone_a: 25, zone_b: 40, zone_c: 20 },
-  { time: '08:00', zone_a: 45, zone_b: 55, zone_c: 40 },
-  { time: '12:00', zone_a: 65, zone_b: 70, zone_c: 55 },
-  { time: '16:00', zone_a: 80, zone_b: 85, zone_c: 70 },
-  { time: '20:00', zone_a: 55, zone_b: 45, zone_c: 60 },
-];
-
 const recyclabilityData = [
   { name: 'Recyclable', value: 68 },
   { name: 'Non-recyclable', value: 32 },
 ];
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('home');
   const { data: metrics } = useModelMetrics();
   const { data: classifications } = useClassificationHistory();
-  const { data: sensorReadings } = useSensorReadings();
 
-  const tabInfo = TAB_TITLES[activeTab] || TAB_TITLES.dashboard;
+  const tabInfo = TAB_TITLES[activeTab] || TAB_TITLES.home;
 
   // Calculate stats
   const totalClassifications = classifications?.length || 0;
   const bestAccuracy = metrics?.[0]?.accuracy 
     ? (Number(metrics[0].accuracy) * 100).toFixed(1) 
     : '96.1';
-  const activeSensors = sensorReadings?.length || 6;
-  const criticalBins = sensorReadings?.filter(r => r.fill_level >= 85).length || 0;
 
   // Distribution data for pie chart
   const distributionData = classifications?.reduce((acc, item) => {
@@ -85,8 +68,14 @@ const Index = () => {
     count: Math.floor(Math.random() * 50) + 10
   }));
 
+  // Recent predictions
+  const recentPredictions = classifications?.slice(0, 5) || [];
+
   const renderContent = () => {
     switch (activeTab) {
+      case 'home':
+        return <HomePage onNavigate={setActiveTab} />;
+
       case 'dashboard':
         return (
           <div className="space-y-6">
@@ -95,31 +84,31 @@ const Index = () => {
               <MetricCard
                 title="Model Accuracy"
                 value={`${bestAccuracy}%`}
-                subtitle="Ensemble model"
+                subtitle="EfficientNet-B4"
                 icon={TrendingUp}
                 trend={{ value: 2.3, isPositive: true }}
                 variant="primary"
               />
               <MetricCard
-                title="Images Processed"
+                title="Total Classified"
                 value={totalClassifications || 1250}
-                subtitle="Total classifications"
+                subtitle="Images processed"
                 icon={CheckCircle2}
                 variant="success"
               />
               <MetricCard
-                title="Active Sensors"
-                value={activeSensors}
-                subtitle="IoT devices online"
-                icon={Radio}
+                title="Avg. Inference"
+                value="185ms"
+                subtitle="Processing time"
+                icon={Zap}
                 variant="default"
               />
               <MetricCard
-                title="Critical Alerts"
-                value={criticalBins}
-                subtitle="Bins > 85% full"
-                icon={AlertTriangle}
-                variant={criticalBins > 0 ? 'destructive' : 'success'}
+                title="Recycling Rate"
+                value="68%"
+                subtitle="Recyclable detected"
+                icon={TrendingUp}
+                variant="success"
               />
             </div>
 
@@ -127,8 +116,8 @@ const Index = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <WasteDistributionChart 
                 data={distributionData}
-                title="Waste Distribution"
-                subtitle="Classification breakdown"
+                title="Category Distribution"
+                subtitle="Waste types breakdown"
               />
               <AccuracyTrendChart
                 data={accuracyTrendData}
@@ -137,33 +126,68 @@ const Index = () => {
               />
             </div>
 
-            {/* Bin Fill Levels */}
+            {/* Bottom Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <FillLevelTrendChart
-                data={fillLevelData}
-                title="Fill Level Trends"
-                subtitle="24-hour bin monitoring"
+              <RecyclabilityChart
+                data={recyclabilityData}
+                title="Recyclability Analysis"
+                subtitle="Recyclable vs non-recyclable"
               />
-              <div className="glass-card p-5 rounded-xl">
-                <h3 className="font-semibold mb-2">Bin Fill Status</h3>
-                <p className="text-xs text-muted-foreground mb-4">Current fill levels</p>
-                <div className="space-y-4">
-                  {(sensorReadings || []).slice(0, 4).map((reading, idx) => (
-                    <div key={reading.id || idx} className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span>{reading.sensor?.location_name || `Zone ${idx + 1}`}</span>
-                        <span className={reading.fill_level >= 85 ? 'text-destructive font-medium' : 'text-muted-foreground'}>
-                          {reading.fill_level}%
-                        </span>
-                      </div>
-                      <Progress 
-                        value={reading.fill_level} 
-                        className={`h-2 ${reading.fill_level >= 85 ? '[&>div]:bg-destructive' : '[&>div]:bg-primary'}`}
-                      />
+              
+              {/* Recent Predictions */}
+              <Card className="glass-card border-0">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-semibold">Recent Predictions</CardTitle>
+                  <p className="text-xs text-muted-foreground">Latest classification results</p>
+                </CardHeader>
+                <CardContent>
+                  {recentPredictions.length > 0 ? (
+                    <div className="space-y-3">
+                      {recentPredictions.map((pred, idx) => {
+                        const cat = WASTE_CATEGORIES.find(
+                          c => c.name.toLowerCase() === pred.primary_category?.toLowerCase()
+                        );
+                        return (
+                          <div 
+                            key={pred.id || idx}
+                            className="flex items-center gap-3 p-3 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                          >
+                            <div 
+                              className="w-10 h-10 rounded-lg flex items-center justify-center text-xl"
+                              style={{ backgroundColor: `${cat?.color}20` }}
+                            >
+                              {cat?.icon || '📦'}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-sm truncate">{pred.primary_category}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {pred.created_at 
+                                  ? formatDistanceToNow(new Date(pred.created_at), { addSuffix: true })
+                                  : 'Recently'
+                                }
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-mono font-medium text-primary">
+                                {((pred.confidence || 0) * 100).toFixed(0)}%
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {pred.is_recyclable ? 'Recyclable' : 'Non-recyclable'}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Clock className="w-10 h-10 mx-auto mb-3 opacity-30" />
+                      <p className="text-sm">No recent predictions</p>
+                      <p className="text-xs mt-1">Start classifying to see results here</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         );
@@ -177,8 +201,8 @@ const Index = () => {
               className="space-y-6"
             >
               {/* Simple Instructions */}
-              <div className="glass-card p-4 rounded-xl">
-                <p className="text-sm text-muted-foreground text-center">
+              <div className="glass-card p-4 rounded-xl text-center">
+                <p className="text-sm text-muted-foreground">
                   Upload an image and the AI will automatically classify the waste type
                 </p>
               </div>
@@ -205,107 +229,24 @@ const Index = () => {
           </div>
         );
 
-      case 'iot':
-        return <IoTSensorPanel />;
-
-      case 'analytics':
-        return (
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <MetricCard
-                title="Inference Speed"
-                value="185ms"
-                subtitle="Avg processing time"
-                icon={Zap}
-                variant="primary"
-              />
-              <MetricCard
-                title="Recycling Rate"
-                value="68%"
-                subtitle="Recyclable detected"
-                icon={CheckCircle2}
-                variant="success"
-              />
-              <MetricCard
-                title="Daily Volume"
-                value="2,450"
-                subtitle="Images today"
-                icon={TrendingUp}
-              />
-            </div>
-
-            {/* Charts */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <WasteDistributionChart 
-                data={distributionData}
-                title="Category Distribution"
-                subtitle="Waste types breakdown"
-              />
-              <RecyclabilityChart
-                data={recyclabilityData}
-                title="Recyclability Analysis"
-                subtitle="Recyclable vs non-recyclable"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AccuracyTrendChart
-                data={accuracyTrendData}
-                title="Accuracy Over Time"
-                subtitle="Monthly accuracy trend"
-              />
-              <FillLevelTrendChart
-                data={fillLevelData}
-                title="Bin Fill Patterns"
-                subtitle="24-hour analysis"
-              />
-            </div>
-          </div>
-        );
-
-      case 'models':
-        return (
-          <div className="space-y-6">
-            {/* Model Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <MetricCard
-                title="Best Model"
-                value="Ensemble"
-                subtitle="Highest accuracy"
-                icon={Cpu}
-                variant="primary"
-              />
-              <MetricCard
-                title="Top Accuracy"
-                value={`${bestAccuracy}%`}
-                subtitle="Ensemble model"
-                icon={TrendingUp}
-                variant="success"
-              />
-              <MetricCard
-                title="Fastest Model"
-                value="MobileNetV3"
-                subtitle="85ms inference"
-                icon={Zap}
-              />
-              <MetricCard
-                title="Total Predictions"
-                value="45.7K"
-                subtitle="All models"
-                icon={CheckCircle2}
-              />
-            </div>
-
-            {/* Comparison Table */}
-            <ModelComparisonTable />
-          </div>
-        );
-
       default:
         return null;
     }
   };
+
+  // Home page has its own full layout
+  if (activeTab === 'home') {
+    return (
+      <DashboardLayout
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        title=""
+        subtitle=""
+      >
+        <HomePage onNavigate={setActiveTab} />
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout

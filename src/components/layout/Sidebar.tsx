@@ -20,11 +20,10 @@ interface SidebarProps {
 
 const navItems = [
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-  { id: 'classify', label: 'Classification', icon: Upload },
-  { id: 'iot', label: 'IoT Sensors', icon: Radio },
+  { id: 'classify', label: 'Image Classification', icon: Upload },
+  { id: 'iot', label: 'IoT Monitoring', icon: Radio },
   { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-  { id: 'models', label: 'ML Models', icon: Cpu },
-  { id: 'dataset', label: 'Dataset', icon: Database },
+  { id: 'models', label: 'Model Management', icon: Cpu },
 ];
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {

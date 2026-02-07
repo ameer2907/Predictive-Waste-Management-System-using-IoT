@@ -2,53 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Smart City Waste Intelligence Platform - Design System
-   Theme: Futuristic dark mode with eco-sustainability accents
-   Colors: Deep slate backgrounds with emerald/green accents
+/* AI-Driven Waste Management System - Professional Dark Blue Theme
+   Primary: Dark Blue (#0B1E3D)
+   Secondary: Navy Gradient (#0F2A5A to #06152E)
+   Accent: Teal/Green (#00C896)
+   Text: Soft white (#E6EEF8)
 */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 @layer base {
   :root {
-    /* Core backgrounds - Deep slate palette */
-    --background: 222 47% 6%;
+    /* Core backgrounds - Dark Blue palette */
+    --background: 216 56% 14%;
     --foreground: 210 40% 96%;
 
-    /* Card surfaces with subtle elevation */
-    --card: 222 47% 8%;
+    /* Card surfaces */
+    --card: 216 56% 17%;
     --card-foreground: 210 40% 96%;
 
     /* Popover/dropdown surfaces */
-    --popover: 222 47% 10%;
+    --popover: 216 56% 19%;
     --popover-foreground: 210 40% 96%;
 
-    /* Primary - Eco emerald green */
-    --primary: 160 84% 39%;
+    /* Primary - Teal accent */
+    --primary: 162 100% 39%;
     --primary-foreground: 0 0% 100%;
 
-    /* Secondary - Muted slate */
-    --secondary: 217 33% 17%;
+    /* Secondary - Navy */
+    --secondary: 216 50% 22%;
     --secondary-foreground: 210 40% 90%;
 
     /* Muted elements */
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 20% 55%;
+    --muted: 216 45% 20%;
+    --muted-foreground: 215 25% 60%;
 
-    /* Accent - Bright teal for highlights */
-    --accent: 174 84% 40%;
+    /* Accent - Bright teal */
+    --accent: 162 100% 39%;
     --accent-foreground: 0 0% 100%;
 
-    /* Destructive - Warm red */
-    --destructive: 0 72% 51%;
+    /* Destructive - Soft red */
+    --destructive: 0 70% 60%;
     --destructive-foreground: 0 0% 100%;
 
     /* Warning - Amber */
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 0%;
 
-    /* Success - Bright green */
-    --success: 142 76% 36%;
+    /* Success - Teal green */
+    --success: 162 100% 39%;
     --success-foreground: 0 0% 100%;
 
     /* Info - Blue */
@@ -56,21 +58,21 @@
     --info-foreground: 0 0% 100%;
 
     /* Borders and inputs */
-    --border: 217 33% 18%;
-    --input: 217 33% 15%;
-    --ring: 160 84% 39%;
+    --border: 216 45% 25%;
+    --input: 216 45% 22%;
+    --ring: 162 100% 39%;
 
     --radius: 0.75rem;
 
     /* Sidebar specific */
-    --sidebar-background: 222 47% 7%;
+    --sidebar-background: 216 56% 11%;
     --sidebar-foreground: 210 40% 85%;
-    --sidebar-primary: 160 84% 39%;
+    --sidebar-primary: 162 100% 39%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 217 33% 12%;
+    --sidebar-accent: 216 45% 18%;
     --sidebar-accent-foreground: 210 40% 90%;
-    --sidebar-border: 217 33% 15%;
-    --sidebar-ring: 160 84% 39%;
+    --sidebar-border: 216 45% 20%;
+    --sidebar-ring: 162 100% 39%;
 
     /* Custom semantic colors for waste categories */
     --waste-plastic: 200 98% 50%;
@@ -83,20 +85,20 @@
     --waste-mixed: 217 33% 40%;
 
     /* Chart colors */
-    --chart-1: 160 84% 39%;
-    --chart-2: 174 84% 40%;
-    --chart-3: 200 98% 50%;
-    --chart-4: 38 92% 50%;
-    --chart-5: 280 85% 65%;
-    --chart-6: 142 76% 36%;
+    --chart-1: 162 100% 39%;
+    --chart-2: 200 98% 50%;
+    --chart-3: 35 95% 55%;
+    --chart-4: 280 85% 65%;
+    --chart-5: 142 76% 40%;
+    --chart-6: 0 72% 51%;
 
     /* Gradient definitions */
-    --gradient-primary: linear-gradient(135deg, hsl(160 84% 39%) 0%, hsl(174 84% 40%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(222 47% 8%) 100%);
-    --gradient-glow: radial-gradient(ellipse at center, hsl(160 84% 39% / 0.15) 0%, transparent 70%);
+    --gradient-primary: linear-gradient(135deg, hsl(162 100% 39%) 0%, hsl(180 80% 35%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(216 56% 19%) 0%, hsl(216 56% 14%) 100%);
+    --gradient-glow: radial-gradient(ellipse at center, hsl(162 100% 39% / 0.15) 0%, transparent 70%);
     
     /* Shadow definitions */
-    --shadow-glow: 0 0 30px -5px hsl(160 84% 39% / 0.3);
+    --shadow-glow: 0 0 30px -5px hsl(162 100% 39% / 0.3);
     --shadow-card: 0 4px 24px -4px hsl(0 0% 0% / 0.5);
     --shadow-elevated: 0 8px 32px -8px hsl(0 0% 0% / 0.6);
   }
@@ -120,25 +122,25 @@
   body {
     @apply bg-background text-foreground;
     background-image: 
-      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(160 84% 39% / 0.08), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 100%, hsl(174 84% 40% / 0.05), transparent);
+      radial-gradient(ellipse 80% 50% at 50% -20%, hsl(162 100% 39% / 0.06), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, hsl(216 56% 25% / 0.3), transparent);
     min-height: 100vh;
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
   }
 
   ::-webkit-scrollbar-track {
     background: hsl(var(--muted));
-    border-radius: 4px;
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb {
     background: hsl(var(--border));
-    border-radius: 4px;
+    border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
@@ -147,14 +149,14 @@
 }
 
 @layer components {
-  /* Glassmorphism card effect */
+  /* Clean card effect */
   .glass-card {
-    @apply bg-card/80 backdrop-blur-xl border border-border/50 rounded-xl;
+    @apply bg-card border border-border/50 rounded-xl;
     box-shadow: var(--shadow-card);
   }
 
   .glass-card-elevated {
-    @apply bg-card/90 backdrop-blur-xl border border-border/60 rounded-xl;
+    @apply bg-card border border-border/60 rounded-xl;
     box-shadow: var(--shadow-elevated);
   }
 
@@ -164,7 +166,7 @@
   }
 
   .glow-text {
-    text-shadow: 0 0 20px hsl(160 84% 39% / 0.5);
+    text-shadow: 0 0 20px hsl(162 100% 39% / 0.5);
   }
 
   /* Metric display styling */
@@ -189,12 +191,12 @@
     0%, 100% {
       opacity: 1;
       transform: scale(1);
-      box-shadow: 0 0 0 0 hsl(142 76% 36% / 0.4);
+      box-shadow: 0 0 0 0 hsl(162 100% 39% / 0.4);
     }
     50% {
       opacity: 0.8;
       transform: scale(1.1);
-      box-shadow: 0 0 0 8px hsl(142 76% 36% / 0);
+      box-shadow: 0 0 0 8px hsl(162 100% 39% / 0);
     }
   }
 
@@ -216,12 +218,7 @@
 
   /* Chart container */
   .chart-container {
-    @apply p-4 rounded-xl bg-gradient-to-b from-muted/30 to-transparent;
-  }
-
-  /* Data grid styling */
-  .data-grid {
-    @apply grid gap-4;
+    @apply p-4 rounded-xl bg-muted/20;
   }
 
   /* Sensor status indicators */
@@ -237,6 +234,19 @@
   .model-row.best {
     @apply bg-primary/10 border-l-2 border-primary;
   }
+
+  /* Status indicators */
+  .status-recyclable {
+    @apply text-success bg-success/10 border border-success/30;
+  }
+  
+  .status-organic {
+    @apply text-warning bg-warning/10 border border-warning/30;
+  }
+  
+  .status-hazardous {
+    @apply text-destructive bg-destructive/10 border border-destructive/30;
+  }
 }
 
 @layer utilities {
@@ -244,18 +254,16 @@
   .animation-delay-100 { animation-delay: 100ms; }
   .animation-delay-200 { animation-delay: 200ms; }
   .animation-delay-300 { animation-delay: 300ms; }
-  .animation-delay-400 { animation-delay: 400ms; }
-  .animation-delay-500 { animation-delay: 500ms; }
 
   /* Fade in animation */
   .animate-fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+    animation: fadeIn 0.3s ease-out forwards;
   }
 
   @keyframes fadeIn {
     from {
       opacity: 0;
-      transform: translateY(10px);
+      transform: translateY(8px);
     }
     to {
       opacity: 1;
@@ -265,13 +273,13 @@
 
   /* Slide up animation */
   .animate-slide-up {
-    animation: slideUp 0.4s ease-out forwards;
+    animation: slideUp 0.3s ease-out forwards;
   }
 
   @keyframes slideUp {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(16px);
     }
     to {
       opacity: 1;
@@ -281,7 +289,7 @@
 
   /* Scale in animation */
   .animate-scale-in {
-    animation: scaleIn 0.3s ease-out forwards;
+    animation: scaleIn 0.2s ease-out forwards;
   }
 
   @keyframes scaleIn {
@@ -293,22 +301,5 @@
       opacity: 1;
       transform: scale(1);
     }
-  }
-
-  /* Shimmer effect for loading states */
-  .shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--muted-foreground) / 0.1) 50%,
-      hsl(var(--muted)) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 1.5s infinite;
-  }
-
-  @keyframes shimmer {
-    0% { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
   }
 }

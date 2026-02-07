@@ -32,7 +32,7 @@ export function ImageUploader() {
     }
   }, []);
 
-  const handleFile = (file: File) => {
+  const handleFile = async (file: File) => {
     if (!file.type.startsWith('image/')) {
       return;
     }
@@ -43,17 +43,14 @@ export function ImageUploader() {
       setSelectedImage(e.target?.result as string);
     };
     reader.readAsDataURL(file);
+    
+    // Auto-classify immediately after upload
+    await classifyImage(file);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       handleFile(e.target.files[0]);
-    }
-  };
-
-  const handleClassify = async () => {
-    if (selectedFile) {
-      await classifyImage(selectedFile);
     }
   };
 
@@ -113,14 +110,10 @@ export function ImageUploader() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-center gap-4 pt-4">
+              <div className="flex items-center justify-center pt-4">
                 <Button variant="outline" className="gap-2">
                   <Image className="w-4 h-4" />
                   Browse Files
-                </Button>
-                <Button variant="outline" className="gap-2">
-                  <Camera className="w-4 h-4" />
-                  Use Camera
                 </Button>
               </div>
             </div>
@@ -162,16 +155,10 @@ export function ImageUploader() {
                 )}
               </div>
 
-              {/* Action Buttons */}
-              {!result && !isClassifying && (
-                <div className="flex items-center justify-between mt-4">
-                  <div className="text-sm text-muted-foreground">
-                    {selectedFile?.name}
-                  </div>
-                  <Button onClick={handleClassify} className="gap-2 shadow-glow">
-                    <CheckCircle2 className="w-4 h-4" />
-                    Classify Waste
-                  </Button>
+              {/* File Info */}
+              {selectedFile && (
+                <div className="mt-4 text-sm text-muted-foreground">
+                  {selectedFile.name}
                 </div>
               )}
             </div>

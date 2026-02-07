@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  Recycle, 
   TrendingUp, 
   Radio, 
   Cpu, 
-  Trash2, 
-  Leaf,
   AlertTriangle,
   CheckCircle2,
-  Clock,
   Zap
 } from 'lucide-react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
@@ -20,20 +16,19 @@ import { ModelComparisonTable } from '@/components/models/ModelComparisonTable';
 import { 
   WasteDistributionChart, 
   AccuracyTrendChart, 
-  ModelBarChart,
   FillLevelTrendChart,
   RecyclabilityChart
 } from '@/components/charts/WasteCharts';
 import { useModelMetrics, useClassificationHistory, useSensorReadings } from '@/hooks/use-dashboard-data';
 import { WASTE_CATEGORIES } from '@/lib/waste-categories';
+import { Progress } from '@/components/ui/progress';
 
 const TAB_TITLES: Record<string, { title: string; subtitle: string }> = {
   dashboard: { title: 'Dashboard', subtitle: 'Real-time waste management analytics' },
-  classify: { title: 'Waste Classification', subtitle: 'AI-powered waste image analysis' },
-  iot: { title: 'IoT Sensors', subtitle: 'Real-time smart bin monitoring' },
+  classify: { title: 'Image Classification', subtitle: 'AI-powered waste image analysis' },
+  iot: { title: 'IoT Monitoring', subtitle: 'Real-time smart bin monitoring' },
   analytics: { title: 'Analytics', subtitle: 'Comprehensive waste insights' },
-  models: { title: 'ML Models', subtitle: 'Model performance comparison' },
-  dataset: { title: 'Dataset Management', subtitle: 'Training data and versioning' },
+  models: { title: 'Model Management', subtitle: 'Model performance comparison' },
 };
 
 // Mock data for charts
@@ -60,11 +55,6 @@ const recyclabilityData = [
   { name: 'Non-recyclable', value: 32 },
 ];
 
-const biodegradableData = [
-  { name: 'Biodegradable', value: 42 },
-  { name: 'Non-biodegradable', value: 58 },
-];
-
 const Index = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const { data: metrics } = useModelMetrics();
@@ -75,14 +65,11 @@ const Index = () => {
 
   // Calculate stats
   const totalClassifications = classifications?.length || 0;
-  const avgConfidence = classifications?.length 
-    ? (classifications.reduce((acc, c) => acc + Number(c.confidence), 0) / classifications.length * 100).toFixed(1)
-    : '0';
   const bestAccuracy = metrics?.[0]?.accuracy 
     ? (Number(metrics[0].accuracy) * 100).toFixed(1) 
-    : '0';
-  const activeSensors = sensorReadings?.length || 0;
-  const criticalBins = sensorReadings?.filter(r => r.fill_level >= 80).length || 0;
+    : '96.1';
+  const activeSensors = sensorReadings?.length || 6;
+  const criticalBins = sensorReadings?.filter(r => r.fill_level >= 85).length || 0;
 
   // Distribution data for pie chart
   const distributionData = classifications?.reduce((acc, item) => {
@@ -98,33 +85,26 @@ const Index = () => {
     count: Math.floor(Math.random() * 50) + 10
   }));
 
-  // Model accuracy data for bar chart
-  const modelAccuracyData = metrics?.map(m => ({
-    name: m.model_name,
-    accuracy: Number(m.accuracy) * 100
-  })) || [];
-
   const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
         return (
           <div className="space-y-6">
-            {/* Metrics Grid */}
+            {/* Top Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <MetricCard
-                title="Total Classifications"
-                value={totalClassifications}
-                subtitle="All-time processed images"
-                icon={Recycle}
-                trend={{ value: 12.5, isPositive: true }}
-                variant="primary"
-              />
               <MetricCard
                 title="Model Accuracy"
                 value={`${bestAccuracy}%`}
-                subtitle="Ensemble model performance"
+                subtitle="Ensemble model"
                 icon={TrendingUp}
                 trend={{ value: 2.3, isPositive: true }}
+                variant="primary"
+              />
+              <MetricCard
+                title="Images Processed"
+                value={totalClassifications || 1250}
+                subtitle="Total classifications"
+                icon={CheckCircle2}
                 variant="success"
               />
               <MetricCard
@@ -135,9 +115,9 @@ const Index = () => {
                 variant="default"
               />
               <MetricCard
-                title="Critical Bins"
+                title="Critical Alerts"
                 value={criticalBins}
-                subtitle="Require immediate attention"
+                subtitle="Bins > 85% full"
                 icon={AlertTriangle}
                 variant={criticalBins > 0 ? 'destructive' : 'success'}
               />
@@ -148,7 +128,7 @@ const Index = () => {
               <WasteDistributionChart 
                 data={distributionData}
                 title="Waste Distribution"
-                subtitle="Classification breakdown by category"
+                subtitle="Classification breakdown"
               />
               <AccuracyTrendChart
                 data={accuracyTrendData}
@@ -157,64 +137,50 @@ const Index = () => {
               />
             </div>
 
-            {/* Second Charts Row */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Bin Fill Levels */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <FillLevelTrendChart
                 data={fillLevelData}
                 title="Fill Level Trends"
-                subtitle="Bin fill levels over 24 hours"
+                subtitle="24-hour bin monitoring"
               />
-              <RecyclabilityChart
-                data={recyclabilityData}
-                title="Recyclability"
-                subtitle="Recyclable vs non-recyclable"
-              />
-              <RecyclabilityChart
-                data={biodegradableData}
-                title="Biodegradability"
-                subtitle="Biodegradable breakdown"
-              />
+              <div className="glass-card p-5 rounded-xl">
+                <h3 className="font-semibold mb-2">Bin Fill Status</h3>
+                <p className="text-xs text-muted-foreground mb-4">Current fill levels</p>
+                <div className="space-y-4">
+                  {(sensorReadings || []).slice(0, 4).map((reading, idx) => (
+                    <div key={reading.id || idx} className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span>{reading.sensor?.location_name || `Zone ${idx + 1}`}</span>
+                        <span className={reading.fill_level >= 85 ? 'text-destructive font-medium' : 'text-muted-foreground'}>
+                          {reading.fill_level}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={reading.fill_level} 
+                        className={`h-2 ${reading.fill_level >= 85 ? '[&>div]:bg-destructive' : '[&>div]:bg-primary'}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-
-            {/* Model Comparison */}
-            <ModelComparisonTable />
           </div>
         );
 
       case 'classify':
         return (
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               className="space-y-6"
             >
-              {/* Instructions Card */}
-              <div className="glass-card p-5 rounded-xl">
-                <h3 className="font-semibold mb-3">How it works</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-semibold">1</div>
-                    <div>
-                      <p className="font-medium text-sm">Upload Image</p>
-                      <p className="text-xs text-muted-foreground">Drag & drop or browse</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-semibold">2</div>
-                    <div>
-                      <p className="font-medium text-sm">AI Analysis</p>
-                      <p className="text-xs text-muted-foreground">Ensemble model processing</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary font-semibold">3</div>
-                    <div>
-                      <p className="font-medium text-sm">Get Results</p>
-                      <p className="text-xs text-muted-foreground">Disposal recommendations</p>
-                    </div>
-                  </div>
-                </div>
+              {/* Simple Instructions */}
+              <div className="glass-card p-4 rounded-xl">
+                <p className="text-sm text-muted-foreground text-center">
+                  Upload an image and the AI will automatically classify the waste type
+                </p>
               </div>
 
               {/* Uploader */}
@@ -229,18 +195,8 @@ const Index = () => {
                       key={category.id}
                       className="flex items-center gap-2 p-2 rounded-lg bg-muted/30"
                     >
-                      <span className="text-xl">{category.icon}</span>
-                      <div>
-                        <p className="text-sm font-medium">{category.name}</p>
-                        <div className="flex gap-1">
-                          {category.recyclable && (
-                            <span className="text-[10px] text-success">♻️</span>
-                          )}
-                          {category.biodegradable && (
-                            <span className="text-[10px] text-success">🌿</span>
-                          )}
-                        </div>
-                      </div>
+                      <span className="text-lg">{category.icon}</span>
+                      <span className="text-sm">{category.name}</span>
                     </div>
                   ))}
                 </div>
@@ -256,33 +212,26 @@ const Index = () => {
         return (
           <div className="space-y-6">
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <MetricCard
-                title="Avg. Confidence"
-                value={`${avgConfidence}%`}
-                subtitle="Classification confidence"
-                icon={CheckCircle2}
-                variant="success"
-              />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <MetricCard
                 title="Inference Speed"
                 value="185ms"
-                subtitle="Average processing time"
+                subtitle="Avg processing time"
                 icon={Zap}
                 variant="primary"
               />
               <MetricCard
-                title="Daily Volume"
-                value="2,450"
-                subtitle="Images processed today"
-                icon={Trash2}
-              />
-              <MetricCard
                 title="Recycling Rate"
                 value="68%"
-                subtitle="Recyclable items detected"
-                icon={Leaf}
+                subtitle="Recyclable detected"
+                icon={CheckCircle2}
                 variant="success"
+              />
+              <MetricCard
+                title="Daily Volume"
+                value="2,450"
+                subtitle="Images today"
+                icon={TrendingUp}
               />
             </div>
 
@@ -293,10 +242,10 @@ const Index = () => {
                 title="Category Distribution"
                 subtitle="Waste types breakdown"
               />
-              <ModelBarChart
-                data={modelAccuracyData}
-                title="Model Accuracy Comparison"
-                subtitle="Performance across all models"
+              <RecyclabilityChart
+                data={recyclabilityData}
+                title="Recyclability Analysis"
+                subtitle="Recyclable vs non-recyclable"
               />
             </div>
 
@@ -309,7 +258,7 @@ const Index = () => {
               <FillLevelTrendChart
                 data={fillLevelData}
                 title="Bin Fill Patterns"
-                subtitle="24-hour fill level analysis"
+                subtitle="24-hour analysis"
               />
             </div>
           </div>
@@ -343,125 +292,13 @@ const Index = () => {
               <MetricCard
                 title="Total Predictions"
                 value="45.7K"
-                subtitle="All models combined"
+                subtitle="All models"
                 icon={CheckCircle2}
               />
             </div>
 
             {/* Comparison Table */}
             <ModelComparisonTable />
-
-            {/* Model Accuracy Chart */}
-            <ModelBarChart
-              data={modelAccuracyData}
-              title="Model Performance Comparison"
-              subtitle="Accuracy across all implemented models"
-            />
-          </div>
-        );
-
-      case 'dataset':
-        return (
-          <div className="space-y-6">
-            {/* Dataset Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <MetricCard
-                title="Total Images"
-                value="24,580"
-                subtitle="Training dataset size"
-                icon={Trash2}
-                variant="primary"
-              />
-              <MetricCard
-                title="Categories"
-                value="8"
-                subtitle="Waste classifications"
-                icon={Recycle}
-              />
-              <MetricCard
-                title="Augmented"
-                value="98,320"
-                subtitle="After data augmentation"
-                icon={TrendingUp}
-                variant="success"
-              />
-              <MetricCard
-                title="Last Updated"
-                value="Today"
-                subtitle="Dataset version 2.4"
-                icon={Clock}
-              />
-            </div>
-
-            {/* Dataset Info Card */}
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-semibold mb-4">Dataset Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3">Class Distribution</h4>
-                  <div className="space-y-2">
-                    {WASTE_CATEGORIES.map(category => {
-                      const count = Math.floor(Math.random() * 4000) + 1500;
-                      const percentage = ((count / 24580) * 100).toFixed(1);
-                      return (
-                        <div key={category.id} className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <span>{category.icon}</span>
-                            <span>{category.name}</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-muted-foreground">{count.toLocaleString()}</span>
-                            <span className="text-xs text-muted-foreground">({percentage}%)</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3">Data Augmentation</h4>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between">
-                      <span>Rotation (±15°)</span>
-                      <CheckCircle2 className="w-4 h-4 text-success" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Horizontal Flip</span>
-                      <CheckCircle2 className="w-4 h-4 text-success" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Brightness Adjustment</span>
-                      <CheckCircle2 className="w-4 h-4 text-success" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Random Crop</span>
-                      <CheckCircle2 className="w-4 h-4 text-success" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Color Jitter</span>
-                      <CheckCircle2 className="w-4 h-4 text-success" />
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span>Gaussian Blur</span>
-                      <CheckCircle2 className="w-4 h-4 text-success" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Upload New Dataset */}
-            <div className="glass-card p-6 rounded-xl">
-              <h3 className="font-semibold mb-2">Upload New Dataset</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                Upload a ZIP file containing labeled waste images organized by category folders.
-              </p>
-              <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors cursor-pointer">
-                <Trash2 className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                <p className="text-sm font-medium">Drop your dataset ZIP here</p>
-                <p className="text-xs text-muted-foreground mt-1">or click to browse</p>
-              </div>
-            </div>
           </div>
         );
 

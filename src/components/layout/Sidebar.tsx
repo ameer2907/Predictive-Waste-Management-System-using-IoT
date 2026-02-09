@@ -4,7 +4,11 @@ import {
   Home,
   Camera,
   BarChart3,
-  Recycle
+  Recycle,
+  Radio,
+  TrendingUp,
+  Cpu,
+  FileText
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -16,6 +20,10 @@ const navItems = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'classify', label: 'Classification', icon: Camera },
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+  { id: 'iot', label: 'IoT Monitoring', icon: Radio },
+  { id: 'analytics', label: 'Predictive Analytics', icon: TrendingUp },
+  { id: 'hardware', label: 'Hardware Overview', icon: Cpu },
+  { id: 'reports', label: 'Reports', icon: FileText },
 ];
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
@@ -28,8 +36,8 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
             <Recycle className="w-6 h-6 text-primary" />
           </div>
           <div>
-            <h1 className="font-bold text-lg text-sidebar-foreground">WasteAI</h1>
-            <p className="text-xs text-sidebar-foreground/60">Classification System</p>
+            <h1 className="font-bold text-sm text-sidebar-foreground leading-tight">Waste Management</h1>
+            <p className="text-xs text-sidebar-foreground/60">AI + IoT System</p>
           </div>
         </div>
       </div>

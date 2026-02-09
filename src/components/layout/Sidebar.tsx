@@ -5,8 +5,6 @@ import {
   Camera,
   BarChart3,
   Recycle,
-  Radio,
-  TrendingUp,
   Cpu,
   FileText
 } from 'lucide-react';
@@ -20,9 +18,7 @@ const navItems = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'classify', label: 'Classification', icon: Camera },
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
-  { id: 'iot', label: 'IoT Monitoring', icon: Radio },
-  { id: 'analytics', label: 'Predictive Analytics', icon: TrendingUp },
-  { id: 'hardware', label: 'Hardware Overview', icon: Cpu },
+  { id: 'hardware', label: '3D Hardware Model', icon: Cpu },
   { id: 'reports', label: 'Reports', icon: FileText },
 ];
 

@@ -25,16 +25,16 @@ export function HomePage({ onNavigate }: HomePageProps) {
             </div>
 
             {/* Main Title */}
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              <span className="text-primary">WasteAI</span>
-              <span className="block text-foreground mt-2">Smart Waste Classification System</span>
+            <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-tight">
+              <span className="text-primary">AI-Driven Predictive Waste Management</span>
+              <span className="block text-foreground mt-2 text-xl md:text-2xl">System for Urban Sustainability using IoT</span>
             </h1>
 
             {/* Description */}
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
-              An advanced AI-driven waste classification platform that uses deep learning 
-              to accurately identify and categorize waste materials, promoting sustainable 
-              waste management and environmental conservation.
+              An advanced AI-driven waste classification and IoT monitoring platform that uses 
+              deep learning and smart sensors to accurately identify waste materials, predict 
+              trends, and optimize urban waste management for environmental sustainability.
             </p>
 
             {/* CTA Buttons */}

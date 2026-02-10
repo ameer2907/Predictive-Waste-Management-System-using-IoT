@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { User } from 'lucide-react';
+
 
 interface HeaderProps {
   title: string;
@@ -25,14 +25,9 @@ export function Header({ title, subtitle }: HeaderProps) {
         )}
       </div>
 
-      <div className="flex items-center gap-3">
-        <div className="text-right hidden sm:block">
-          <p className="text-sm font-medium">Operator</p>
-          <p className="text-xs text-muted-foreground">System Admin</p>
-        </div>
-        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center">
-          <User className="w-4 h-4 text-white" />
-        </div>
+      <div className="flex items-center gap-2">
+        <div className="w-2 h-2 rounded-full bg-success animate-pulse" />
+        <span className="text-xs text-muted-foreground">System Online</span>
       </div>
     </motion.header>
   );

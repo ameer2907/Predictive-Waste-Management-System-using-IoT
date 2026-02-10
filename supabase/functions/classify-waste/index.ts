@@ -76,19 +76,19 @@ Be accurate and detailed. If the image is unclear, still provide your best class
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-pro",
+        model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
           { 
             role: "user", 
             content: [
-              { type: "text", text: "Analyze and classify this waste item. Provide detailed classification in JSON format." },
+              { type: "text", text: "Classify this waste item. Return JSON only, no explanation." },
               imageContent
             ]
           }
         ],
-        max_tokens: 1500,
-        temperature: 0.3,
+        max_tokens: 800,
+        temperature: 0.2,
       }),
     });
 

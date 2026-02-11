@@ -10,6 +10,7 @@ import { WASTE_CATEGORIES } from '@/lib/waste-categories';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatDistanceToNow } from 'date-fns';
 import { motion } from 'framer-motion';
+import { DeviceMonitor, InsightsSection } from '@/components/dashboard/DeviceInsights';
 
 const accuracyTrendData = [
   { date: 'Jan', accuracy: 88 },
@@ -190,6 +191,12 @@ export function DashboardTab() {
         </Card>
       </div>
 
+      {/* ESP32 Device Monitor */}
+      <DeviceMonitor />
+
+      {/* Pattern Insights */}
+      <InsightsSection />
+
       {/* System Status */}
       <Card className="glass-card border-0">
         <CardHeader className="pb-3">
@@ -201,7 +208,7 @@ export function DashboardTab() {
               { label: 'AI Model', status: 'Active', ok: true },
               { label: 'IoT Gateway', status: 'Connected', ok: true },
               { label: 'Cloud Backend', status: 'Online', ok: true },
-              { label: 'Predictions API', status: 'Running', ok: true },
+              { label: 'ESP32 API', status: 'Running', ok: true },
             ].map(s => (
               <div key={s.label} className="flex items-center gap-2 p-3 rounded-lg bg-muted/30">
                 <div className={`w-2 h-2 rounded-full ${s.ok ? 'bg-success animate-pulse' : 'bg-destructive'}`} />

@@ -94,9 +94,7 @@ export interface ClassificationResult {
   environmental_impact: string;
   recycling_instructions?: string;
   hazard_warning?: string;
-  material_composition: string;
-  contamination_level: string;
-  processing_difficulty: string;
+  servo_action?: 'RECYCLABLE' | 'NON_RECYCLABLE' | 'UNCERTAIN';
   timestamp: string;
   model_used: string;
   inference_time_ms: number;

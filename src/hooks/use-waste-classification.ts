@@ -17,29 +17,39 @@ export function useWasteClassification() {
       let payload: { imageBase64?: string; imageUrl?: string } = {};
 
       if (typeof imageSource === 'string') {
-        // It's a URL
         payload.imageUrl = imageSource;
       } else {
-        // It's a File - convert to base64
         const base64 = await fileToBase64(imageSource);
         payload.imageBase64 = base64;
       }
 
-      const { data, error: fnError } = await supabase.functions.invoke('classify-waste', {
-        body: payload
-      });
+      let data: any = null;
+      let lastError: Error | null = null;
 
-      if (fnError) {
-        throw new Error(fnError.message);
+      // Retry once on network failure
+      for (let attempt = 0; attempt < 2; attempt++) {
+        const { data: d, error: fnError } = await supabase.functions.invoke('classify-waste', {
+          body: payload
+        });
+
+        if (fnError) {
+          lastError = new Error(fnError.message);
+          if (attempt === 0) { await new Promise(r => setTimeout(r, 1000)); continue; }
+          throw lastError;
+        }
+
+        if (d?.error) {
+          throw new Error(d.error);
+        }
+
+        data = d;
+        break;
       }
 
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      if (!data) throw lastError || new Error('Classification failed');
 
       setResult(data as ClassificationResult);
       
-      // Store classification in database
       await storeClassification(data, typeof imageSource === 'string' ? imageSource : 'uploaded-image');
       
       toast.success('Classification complete!', {
@@ -50,7 +60,14 @@ export function useWasteClassification() {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Classification failed';
       setError(message);
-      toast.error('Classification failed', { description: message });
+      
+      if (message.includes('Rate limit')) {
+        toast.error('Rate limit exceeded', { description: 'Please wait a moment and try again.' });
+      } else if (message.includes('Payment')) {
+        toast.error('Credits required', { description: 'Please add credits to continue.' });
+      } else {
+        toast.error('Classification failed', { description: message });
+      }
       return null;
     } finally {
       setIsClassifying(false);

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { 
   Recycle, Leaf, AlertTriangle, CheckCircle2, XCircle, Info, 
-  Sparkles, Shield, Trash2
+  Sparkles, Shield, Zap, ArrowRightLeft, Clock
 } from 'lucide-react';
 import { ClassificationResult as ClassificationResultType, WASTE_CATEGORIES } from '@/lib/waste-categories';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,10 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
   const confidencePercent = result.confidence * 100;
   const isUncertain = confidencePercent < 60;
   const isHighConfidence = confidencePercent >= 90;
+
+  const servoAction = result.servo_action || (result.is_recyclable ? 'RECYCLABLE' : 'NON_RECYCLABLE');
+  const servoColor = servoAction === 'RECYCLABLE' ? 'text-success' : servoAction === 'NON_RECYCLABLE' ? 'text-destructive' : 'text-warning';
+  const servoBg = servoAction === 'RECYCLABLE' ? 'bg-success/10 border-success/30' : servoAction === 'NON_RECYCLABLE' ? 'bg-destructive/10 border-destructive/30' : 'bg-warning/10 border-warning/30';
 
   return (
     <motion.div
@@ -51,7 +55,6 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
         transition={{ delay: 0.1 }}
         className="glass-card-elevated rounded-2xl overflow-hidden"
       >
-        {/* Top bar with category color */}
         <div className="h-1.5" style={{ background: `linear-gradient(90deg, ${category.color}, transparent)` }} />
         
         <div className="p-6">
@@ -100,6 +103,18 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+
+          {/* Inference time + Servo action inline */}
+          <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/30">
+            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+              <Clock className="w-3.5 h-3.5" />
+              <span>{result.inference_time_ms}ms inference</span>
+            </div>
+            <div className={cn("flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border", servoBg, servoColor)}>
+              <ArrowRightLeft className="w-3.5 h-3.5" />
+              Servo: {servoAction}
             </div>
           </div>
         </div>
@@ -157,7 +172,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
         </div>
       </motion.div>
 
-      {/* Properties Grid - 2x2 */}
+      {/* Properties Grid */}
       <div className="grid grid-cols-2 gap-3">
         <motion.div
           initial={{ opacity: 0, x: -10 }}

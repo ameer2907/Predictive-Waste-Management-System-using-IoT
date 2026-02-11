@@ -5,16 +5,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const WASTE_CATEGORIES = [
-  { name: "Plastic", subcategories: ["PET", "HDPE", "LDPE", "Single-use plastic"], recyclable: true, biodegradable: false },
-  { name: "Paper", subcategories: ["Newspaper", "Cardboard", "Mixed paper"], recyclable: true, biodegradable: true },
-  { name: "Glass", subcategories: ["Clear glass", "Colored glass"], recyclable: true, biodegradable: false },
-  { name: "Metal", subcategories: ["Aluminum", "Steel", "Tin"], recyclable: true, biodegradable: false },
-  { name: "Organic", subcategories: ["Food waste", "Garden waste", "Biodegradable"], recyclable: false, biodegradable: true },
-  { name: "E-waste", subcategories: ["Electronics", "Batteries", "Cables"], recyclable: true, biodegradable: false },
-  { name: "Hazardous", subcategories: ["Chemicals", "Medical waste", "Batteries"], recyclable: false, biodegradable: false },
-  { name: "Mixed/Non-recyclable", subcategories: ["Mixed materials", "Contaminated", "Non-recyclable"], recyclable: false, biodegradable: false }
-];
+const RECYCLABLE = ['Plastic', 'Paper', 'Glass', 'Metal', 'E-waste'];
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -23,7 +14,7 @@ serve(async (req) => {
 
   try {
     const { imageBase64, imageUrl } = await req.json();
-    
+
     if (!imageBase64 && !imageUrl) {
       return new Response(
         JSON.stringify({ error: 'No image provided. Send imageBase64 or imageUrl.' }),
@@ -32,42 +23,13 @@ serve(async (req) => {
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
-    }
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    console.log("Processing waste classification request...");
-
-    // Build the image content for the API
-    const imageContent = imageBase64 
+    const imageContent = imageBase64
       ? { type: "image_url", image_url: { url: `data:image/jpeg;base64,${imageBase64}` } }
       : { type: "image_url", image_url: { url: imageUrl } };
 
-    const systemPrompt = `You are an expert waste classification AI system for urban sustainability. 
-Analyze the provided image and classify the waste item(s) visible.
-
-You MUST respond with a valid JSON object in this exact format:
-{
-  "primary_category": "one of: Plastic, Paper, Glass, Metal, Organic, E-waste, Hazardous, Mixed/Non-recyclable",
-  "subcategory": "specific type within the category",
-  "confidence": 0.95,
-  "top_predictions": [
-    {"category": "Category1", "confidence": 0.95},
-    {"category": "Category2", "confidence": 0.03},
-    {"category": "Category3", "confidence": 0.02}
-  ],
-  "is_recyclable": true,
-  "is_biodegradable": false,
-  "disposal_method": "Description of proper disposal method",
-  "environmental_impact": "Brief description of environmental impact",
-  "recycling_instructions": "Step-by-step recycling instructions if applicable",
-  "hazard_warning": "Any safety warnings if applicable, or null",
-  "material_composition": "Identified materials in the item",
-  "contamination_level": "clean, slightly_contaminated, heavily_contaminated",
-  "processing_difficulty": "easy, moderate, difficult"
-}
-
-Be accurate and detailed. If the image is unclear, still provide your best classification with appropriate confidence level.`;
+    const startTime = Date.now();
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -78,32 +40,45 @@ Be accurate and detailed. If the image is unclear, still provide your best class
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
         messages: [
-          { role: "system", content: systemPrompt },
-          { 
-            role: "user", 
+          {
+            role: "system",
+            content: `You are a waste classification AI. Classify the item into exactly one of: Plastic, Paper, Glass, Metal, Organic, E-waste, Hazardous, Mixed/Non-recyclable.
+
+Return ONLY valid JSON:
+{
+  "primary_category": "Category",
+  "subcategory": "specific type",
+  "confidence": 0.95,
+  "top_predictions": [{"category":"Cat1","confidence":0.95},{"category":"Cat2","confidence":0.03},{"category":"Cat3","confidence":0.02}],
+  "is_recyclable": true,
+  "is_biodegradable": false,
+  "disposal_method": "How to dispose",
+  "environmental_impact": "Brief impact",
+  "recycling_instructions": "Steps or null",
+  "hazard_warning": "Warning or null"
+}`
+          },
+          {
+            role: "user",
             content: [
-              { type: "text", text: "Classify this waste item. Return JSON only, no explanation." },
+              { type: "text", text: "Classify this waste item. JSON only." },
               imageContent
             ]
           }
         ],
-        max_tokens: 800,
-        temperature: 0.2,
+        max_tokens: 500,
+        temperature: 0.15,
       }),
     });
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
-          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
       if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Payment required. Please add credits to continue." }),
-          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        return new Response(JSON.stringify({ error: "Payment required. Please add credits." }),
+          { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
@@ -112,23 +87,15 @@ Be accurate and detailed. If the image is unclear, still provide your best class
 
     const aiResponse = await response.json();
     const content = aiResponse.choices?.[0]?.message?.content;
+    if (!content) throw new Error("No content in AI response");
 
-    if (!content) {
-      throw new Error("No content in AI response");
-    }
+    const inferenceMs = Date.now() - startTime;
 
-    console.log("AI Response received:", content.substring(0, 200));
-
-    // Parse the JSON from the response
     let classification;
     try {
-      // Extract JSON from the response (handle markdown code blocks)
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\{[\s\S]*\}/);
-      const jsonStr = jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content;
-      classification = JSON.parse(jsonStr);
-    } catch (parseError) {
-      console.error("Failed to parse AI response as JSON:", parseError);
-      // Fallback classification based on content analysis
+      classification = JSON.parse(jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content);
+    } catch {
       classification = {
         primary_category: "Mixed/Non-recyclable",
         subcategory: "Unknown",
@@ -141,37 +108,29 @@ Be accurate and detailed. If the image is unclear, still provide your best class
         is_recyclable: false,
         is_biodegradable: false,
         disposal_method: "General waste disposal",
-        environmental_impact: "Unable to determine specific impact",
-        recycling_instructions: null,
-        hazard_warning: null,
-        material_composition: "Unknown",
-        contamination_level: "unknown",
-        processing_difficulty: "unknown"
+        environmental_impact: "Unable to determine",
       };
     }
 
-    // Validate and enrich the response
-    const categoryInfo = WASTE_CATEGORIES.find(c => 
-      c.name.toLowerCase() === classification.primary_category?.toLowerCase()
-    ) || WASTE_CATEGORIES[7]; // Default to Mixed
-
-    const enrichedClassification = {
-      ...classification,
-      is_recyclable: classification.is_recyclable ?? categoryInfo.recyclable,
-      is_biodegradable: classification.is_biodegradable ?? categoryInfo.biodegradable,
-      category_info: categoryInfo,
-      timestamp: new Date().toISOString(),
-      model_used: "EfficientNet-B4 + Vision Transformer Ensemble",
-      inference_time_ms: Math.floor(Math.random() * 100) + 150
-    };
-
-    console.log("Classification complete:", enrichedClassification.primary_category);
+    const isRecyclable = RECYCLABLE.includes(classification.primary_category);
+    const confidence = classification.confidence || 0;
+    let servo_action: string;
+    if (confidence < 0.5) servo_action = 'UNCERTAIN';
+    else if (isRecyclable) servo_action = 'RECYCLABLE';
+    else servo_action = 'NON_RECYCLABLE';
 
     return new Response(
-      JSON.stringify(enrichedClassification),
+      JSON.stringify({
+        ...classification,
+        is_recyclable: classification.is_recyclable ?? isRecyclable,
+        is_biodegradable: classification.is_biodegradable ?? false,
+        servo_action,
+        timestamp: new Date().toISOString(),
+        model_used: "Gemini 2.5 Flash",
+        inference_time_ms: inferenceMs,
+      }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-
   } catch (error) {
     console.error("Classification error:", error);
     return new Response(

@@ -83,6 +83,36 @@ export type Database = {
         }
         Relationships: []
       }
+      device_logs: {
+        Row: {
+          bin_fill_level: number | null
+          category: string
+          confidence: number
+          created_at: string
+          device_id: string
+          id: string
+          servo_action: string
+        }
+        Insert: {
+          bin_fill_level?: number | null
+          category: string
+          confidence: number
+          created_at?: string
+          device_id: string
+          id?: string
+          servo_action: string
+        }
+        Update: {
+          bin_fill_level?: number | null
+          category?: string
+          confidence?: number
+          created_at?: string
+          device_id?: string
+          id?: string
+          servo_action?: string
+        }
+        Relationships: []
+      }
       iot_sensors: {
         Row: {
           bin_type: string

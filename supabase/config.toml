@@ -2,3 +2,6 @@ project_id = "lnwmtvpoigxpqrivauml"
 
 [functions.classify-waste]
 verify_jwt = false
+
+[functions.esp32-classify]
+verify_jwt = false

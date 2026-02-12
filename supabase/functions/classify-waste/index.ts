@@ -5,8 +5,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const RECYCLABLE = ['Plastic', 'Paper', 'Glass', 'Metal', 'E-waste'];
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -42,32 +40,41 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are a waste classification AI. Classify the item into exactly one of: Plastic, Paper, Glass, Metal, Organic, E-waste, Hazardous, Mixed/Non-recyclable.
+            content: `You are a waste classification AI trained on biodegradable, non-biodegradable, and trash datasets. Classify the item into exactly ONE of three categories:
+
+1. **Biodegradable** — cardboard, paper, food waste, garden waste, wood, natural fibers
+2. **Non-Biodegradable** — plastic, glass, metal, aluminum, steel, rubber, synthetic materials
+3. **Trash** — mixed waste, contaminated items, non-recyclable composites, styrofoam, cigarette butts, diapers
+
+Internal mapping:
+- cardboard, paper → Biodegradable
+- plastic, glass, metal → Non-Biodegradable  
+- everything else unclear → Trash
 
 Return ONLY valid JSON:
 {
-  "primary_category": "Category",
-  "subcategory": "specific type",
+  "primary_category": "Biodegradable" | "Non-Biodegradable" | "Trash",
+  "subcategory": "specific material type e.g. Cardboard, PET Plastic, Glass Bottle",
   "confidence": 0.95,
-  "top_predictions": [{"category":"Cat1","confidence":0.95},{"category":"Cat2","confidence":0.03},{"category":"Cat3","confidence":0.02}],
+  "top_predictions": [{"category":"Biodegradable","confidence":0.95},{"category":"Non-Biodegradable","confidence":0.03},{"category":"Trash","confidence":0.02}],
   "is_recyclable": true,
-  "is_biodegradable": false,
-  "disposal_method": "How to dispose",
-  "environmental_impact": "Brief impact",
-  "recycling_instructions": "Steps or null",
-  "hazard_warning": "Warning or null"
+  "is_biodegradable": true,
+  "disposal_method": "Dispose in Green Bin / Recycling Bin / General Waste",
+  "environmental_impact": "Brief environmental impact",
+  "recycling_instructions": "Steps if recyclable, or null",
+  "hazard_warning": "Warning if hazardous, or null"
 }`
           },
           {
             role: "user",
             content: [
-              { type: "text", text: "Classify this waste item. JSON only." },
+              { type: "text", text: "Classify this waste item accurately. Return JSON only." },
               imageContent
             ]
           }
         ],
-        max_tokens: 500,
-        temperature: 0.15,
+        max_tokens: 400,
+        temperature: 0.1,
       }),
     });
 
@@ -97,34 +104,53 @@ Return ONLY valid JSON:
       classification = JSON.parse(jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content);
     } catch {
       classification = {
-        primary_category: "Mixed/Non-recyclable",
+        primary_category: "Trash",
         subcategory: "Unknown",
         confidence: 0.5,
         top_predictions: [
-          { category: "Mixed/Non-recyclable", confidence: 0.5 },
-          { category: "Plastic", confidence: 0.25 },
-          { category: "Paper", confidence: 0.25 }
+          { category: "Trash", confidence: 0.5 },
+          { category: "Biodegradable", confidence: 0.25 },
+          { category: "Non-Biodegradable", confidence: 0.25 }
         ],
         is_recyclable: false,
         is_biodegradable: false,
-        disposal_method: "General waste disposal",
+        disposal_method: "Mixed Waste – Manual Sorting Needed",
         environmental_impact: "Unable to determine",
       };
     }
 
-    const isRecyclable = RECYCLABLE.includes(classification.primary_category);
+    // Determine servo action based on category
+    const category = classification.primary_category || "Trash";
     const confidence = classification.confidence || 0;
     let servo_action: string;
-    if (confidence < 0.5) servo_action = 'UNCERTAIN';
-    else if (isRecyclable) servo_action = 'RECYCLABLE';
-    else servo_action = 'NON_RECYCLABLE';
+    if (confidence < 0.5) {
+      servo_action = 'UNCERTAIN';
+    } else if (category === 'Biodegradable') {
+      servo_action = 'RECYCLABLE';
+    } else if (category === 'Non-Biodegradable') {
+      servo_action = 'RECYCLABLE';
+    } else {
+      servo_action = 'NON_RECYCLABLE';
+    }
+
+    // Generate disposal message
+    let disposal_message: string;
+    if (category === 'Biodegradable') {
+      disposal_message = '🟢 Dispose in Green Bin (Biodegradable)';
+    } else if (category === 'Non-Biodegradable') {
+      disposal_message = '🔵 Dispose in Recycling / Non-Bio Bin';
+    } else {
+      disposal_message = '⚫ Mixed Waste – Manual Sorting Needed';
+    }
 
     return new Response(
       JSON.stringify({
         ...classification,
-        is_recyclable: classification.is_recyclable ?? isRecyclable,
-        is_biodegradable: classification.is_biodegradable ?? false,
+        primary_category: category,
+        is_recyclable: category !== 'Trash',
+        is_biodegradable: category === 'Biodegradable',
         servo_action,
+        disposal_message,
         timestamp: new Date().toISOString(),
         model_used: "Gemini 2.5 Flash",
         inference_time_ms: inferenceMs,

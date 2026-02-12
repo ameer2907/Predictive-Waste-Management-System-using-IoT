@@ -6,7 +6,8 @@ import {
   BarChart3,
   Recycle,
   Cpu,
-  FileText
+  FileText,
+  Wifi
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -18,6 +19,7 @@ const navItems = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'classify', label: 'Classification', icon: Camera },
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+  { id: 'wifi', label: 'WiFi / Hardware', icon: Wifi },
   { id: 'hardware', label: '3D Hardware Model', icon: Cpu },
   { id: 'reports', label: 'Reports', icon: FileText },
 ];

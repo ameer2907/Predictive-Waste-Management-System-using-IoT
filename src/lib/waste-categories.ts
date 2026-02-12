@@ -1,83 +1,36 @@
 export const WASTE_CATEGORIES = [
   { 
-    id: 'plastic',
-    name: 'Plastic', 
-    color: 'hsl(200 98% 50%)',
-    subcategories: ['PET', 'HDPE', 'LDPE', 'Single-use plastic'],
-    recyclable: true,
-    biodegradable: false,
-    icon: '♻️',
-    description: 'Synthetic polymers made from petroleum'
-  },
-  { 
-    id: 'paper',
-    name: 'Paper', 
-    color: 'hsl(35 95% 55%)',
-    subcategories: ['Newspaper', 'Cardboard', 'Mixed paper'],
-    recyclable: true,
-    biodegradable: true,
-    icon: '📄',
-    description: 'Wood pulp-based materials'
-  },
-  { 
-    id: 'glass',
-    name: 'Glass', 
-    color: 'hsl(280 85% 65%)',
-    subcategories: ['Clear glass', 'Colored glass', 'Tempered glass'],
-    recyclable: true,
-    biodegradable: false,
-    icon: '🫙',
-    description: 'Silica-based transparent material'
-  },
-  { 
-    id: 'metal',
-    name: 'Metal', 
-    color: 'hsl(220 15% 55%)',
-    subcategories: ['Aluminum', 'Steel', 'Tin', 'Copper'],
-    recyclable: true,
-    biodegradable: false,
-    icon: '🔩',
-    description: 'Metallic elements and alloys'
-  },
-  { 
-    id: 'organic',
-    name: 'Organic', 
+    id: 'biodegradable',
+    name: 'Biodegradable', 
     color: 'hsl(142 76% 40%)',
-    subcategories: ['Food waste', 'Garden waste', 'Compostable'],
-    recyclable: false,
+    subcategories: ['Cardboard', 'Paper', 'Food waste', 'Garden waste', 'Wood'],
+    recyclable: true,
     biodegradable: true,
-    icon: '🍂',
-    description: 'Biodegradable organic matter'
+    icon: '🟢',
+    binLabel: 'Green Bin',
+    description: 'Organic and paper-based materials that decompose naturally'
   },
   { 
-    id: 'ewaste',
-    name: 'E-waste', 
-    color: 'hsl(0 72% 51%)',
-    subcategories: ['Electronics', 'Batteries', 'Cables', 'Circuit boards'],
+    id: 'non-biodegradable',
+    name: 'Non-Biodegradable', 
+    color: 'hsl(200 98% 50%)',
+    subcategories: ['Plastic', 'Glass', 'Metal', 'Aluminum', 'Rubber'],
     recyclable: true,
     biodegradable: false,
-    icon: '🔌',
-    description: 'Electronic and electrical waste'
+    icon: '🔵',
+    binLabel: 'Recycling Bin',
+    description: 'Synthetic and inorganic recyclable materials'
   },
   { 
-    id: 'hazardous',
-    name: 'Hazardous', 
-    color: 'hsl(340 82% 52%)',
-    subcategories: ['Chemicals', 'Medical waste', 'Toxic materials'],
-    recyclable: false,
-    biodegradable: false,
-    icon: '☣️',
-    description: 'Dangerous materials requiring special handling'
-  },
-  { 
-    id: 'mixed',
-    name: 'Mixed/Non-recyclable', 
+    id: 'trash',
+    name: 'Trash', 
     color: 'hsl(217 33% 40%)',
-    subcategories: ['Mixed materials', 'Contaminated', 'Non-recyclable'],
+    subcategories: ['Mixed waste', 'Contaminated', 'Styrofoam', 'Composite'],
     recyclable: false,
     biodegradable: false,
-    icon: '🗑️',
-    description: 'Items that cannot be easily recycled'
+    icon: '⚫',
+    binLabel: 'General Waste',
+    description: 'Mixed or non-recyclable items requiring manual sorting'
   }
 ] as const;
 
@@ -91,6 +44,7 @@ export interface ClassificationResult {
   is_recyclable: boolean;
   is_biodegradable: boolean;
   disposal_method: string;
+  disposal_message?: string;
   environmental_impact: string;
   recycling_instructions?: string;
   hazard_warning?: string;

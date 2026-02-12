@@ -73,6 +73,76 @@ Data augmentation techniques such as rotation, flipping, zooming, and brightness
 
 ---
 
+How to Run the Project:
+
+1. Clone the Repository
+
+Open terminal or command prompt:
+
+git clone <your-github-repo-link>
+cd <project-folder>
+
+2. Create Virtual Environment (Recommended)
+
+Windows:
+
+python -m venv venv
+venv\Scripts\activate
+
+
+Mac/Linux:
+
+python3 -m venv venv
+source venv/bin/activate
+
+3. Install Required Libraries
+pip install -r requirements.txt
+
+
+If you don’t have a requirements file, install manually:
+
+pip install tensorflow keras flask numpy pillow opencv-python
+
+4. Add Dataset
+
+Make sure your dataset folder is inside the project directory:
+
+project/
+│
+├── dataset/
+│   ├── biodegradable/
+│   ├── non_biodegradable/
+│   └── trash/
+
+5. Train the Model (If Needed)
+python train.py
+
+
+This will generate:
+
+model.h5
+
+
+If you already trained the model, you can skip this step.
+
+6. Run the Application
+
+If using Flask backend:
+
+python app.py
+
+
+You will see:
+
+Running on http://127.0.0.1:5000
+
+
+Open browser and go to:
+
+http://127.0.0.1:5000
+
+---
+
 ## Features
 
 * AI-based image classification

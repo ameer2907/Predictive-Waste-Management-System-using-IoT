@@ -1,216 +1,181 @@
-# AI-Driven Predictive Waste Management System
+# AI-Driven Predictive Waste Management System using IoT
 
-An intelligent waste classification system that uses Deep Learning to automatically identify waste type and suggest the correct disposal method. This project supports urban sustainability by helping users segregate waste into biodegradable, recyclable, and general waste categories.
+An intelligent waste classification system that uses Deep Learning to automatically identify the type of waste and suggest the correct disposal method. The system supports sustainable waste management by enabling proper segregation of biodegradable, recyclable, and general waste.
 
----
-
-## Overview
-
-This system classifies waste images into three main categories:
-
-* **Biodegradable** – Organic waste that decomposes naturally
-* **Non-Biodegradable (Recyclable)** – Materials that can be processed and reused
-* **Trash** – Mixed or non-recyclable waste requiring landfill or manual sorting
-
-The model is trained using a custom dataset and optimized for fast, real-time predictions suitable for demo and practical applications.
+Model Accuracy: Approximately 98–99% using Transfer Learning and augmented dataset.
 
 ---
 
-## Classification Logic
+## Project Overview
 
-### Biodegradable (Green Bin)
+Improper waste segregation leads to environmental pollution and inefficient recycling. This project uses an AI-based image classification model to automatically categorize waste into three main classes:
 
+* Biodegradable
+* Non-Biodegradable (Recyclable)
+* Trash (General Waste)
+
+The system provides real-time predictions along with disposal recommendations, making it suitable for smart waste management applications and academic demonstration.
+
+---
+
+## Waste Classification Logic
+
+**Biodegradable (Green Bin)**
+Materials that naturally decompose.
 Includes:
 
 * Paper
 * Cardboard
 
-Suggested Action: Compost / Organic Waste Disposal
+Suggested Action: Compost or organic disposal.
 
 ---
 
-### Non-Biodegradable (Recycling Bin)
-
+**Non-Biodegradable (Recycling Bin)**
+Materials that do not decompose but can be processed and reused.
 Includes:
 
 * Plastic
 * Glass
 * Metal
 
-Suggested Action: Send to Recycling
+Suggested Action: Send for recycling.
 
 ---
 
-### Trash (General Waste)
+**Trash (General Waste)**
+Mixed or contaminated materials that cannot be recycled.
 
-Includes:
-
-* Mixed waste
-* Contaminated or non-recyclable items
-
-Suggested Action: General Waste / Landfill / Manual Sorting
+Suggested Action: Landfill or manual sorting.
 
 ---
 
 ## Dataset Structure
 
-```
-dataset/
-│
-├── biodegradable/
-│   ├── cardboard/
-│   └── paper/
-│
-├── non_biodegradable/
-│   ├── plastic/
-│   ├── glass/
-│   └── metal/
-│
-└── trash/
-```
+The model is trained using a custom dataset organized into three categories:
 
-Data augmentation techniques such as rotation, flipping, zooming, and brightness adjustment were used to improve model accuracy and generalization.
+* Biodegradable
 
----
+  * Cardboard
+  * Paper
 
-How to Run the Project:
+* Non-Biodegradable
 
-1. Clone the Repository
+  * Plastic
+  * Glass
+  * Metal
 
-Open terminal or command prompt:
+* Trash
 
-git clone <your-github-repo-link>
-cd <project-folder>
+To improve model performance, the following data augmentation techniques were applied:
 
-2. Create Virtual Environment (Recommended)
-
-Windows:
-
-python -m venv venv
-venv\Scripts\activate
-
-
-Mac/Linux:
-
-python3 -m venv venv
-source venv/bin/activate
-
-3. Install Required Libraries
-pip install -r requirements.txt
-
-
-If you don’t have a requirements file, install manually:
-
-pip install tensorflow keras flask numpy pillow opencv-python
-
-4. Add Dataset
-
-Make sure your dataset folder is inside the project directory:
-
-project/
-│
-├── dataset/
-│   ├── biodegradable/
-│   ├── non_biodegradable/
-│   └── trash/
-
-5. Train the Model (If Needed)
-python train.py
-
-
-This will generate:
-
-model.h5
-
-
-If you already trained the model, you can skip this step.
-
-6. Run the Application
-
-If using Flask backend:
-
-python app.py
-
-
-You will see:
-
-Running on http://127.0.0.1:5000
-
-
-Open browser and go to:
-
-http://127.0.0.1:5000
+* Rotation
+* Horizontal flipping
+* Zoom
+* Brightness adjustment
 
 ---
 
-## Features
+## Key Features
 
-* AI-based image classification
-* Real-time prediction (fast inference)
+* AI-based waste image classification
+* Real-time prediction with fast inference
 * Confidence score display
-* Disposal recommendation based on waste type
-* Upload image or capture via camera
-* “Classify Another Image” option for continuous testing
+* Disposal recommendation based on predicted class
+* Image upload or camera capture
+* Option to classify multiple images continuously
 * Professional dark navy user interface
-* Dashboard-ready architecture for IoT integration
+* Designed for future IoT smart bin integration
 
 ---
 
 ## Model Details
 
-* Transfer Learning (MobileNetV2 / EfficientNet / ResNet)
+* Convolutional Neural Network with Transfer Learning
+* Pretrained architectures such as MobileNetV2 / EfficientNet / ResNet
 * Image preprocessing and normalization
 * Class balancing and augmentation
 * Optimized for high accuracy and demo performance
 
 ---
 
+## Technology Stack
+
+Backend:
+
+* Python
+* TensorFlow / Keras
+* Flask
+
+Frontend:
+
+* React (Vite)
+* Tailwind CSS
+
+Artificial Intelligence:
+
+* Deep Learning (CNN)
+* Transfer Learning
+
+---
+
+## How to Run the Project
+
+1. Clone the repository from GitHub.
+2. Open the project folder in VS Code or terminal.
+3. Create and activate a virtual environment.
+4. Install the required dependencies using requirements.txt.
+5. Place the dataset folder inside the project directory.
+6. Train the model using train.py (skip if model.h5 already exists).
+7. Run the backend using app.py.
+8. Open the application in a browser at:
+   [http://127.0.0.1:5000](http://127.0.0.1:5000)
+
+If a React frontend is used:
+
+* Navigate to the frontend folder
+* Run npm install
+* Start the development server using npm run dev
+
+---
+
 ## User Workflow
 
-1. Open the Classification page
+1. Open the application
 2. Upload or capture a waste image
 3. The system analyzes the image
 4. Displays:
 
-   * Predicted Category
-   * Confidence Percentage
-   * Disposal Recommendation
-5. Click **Classify Another Image** to test more samples
+   * Predicted category
+   * Confidence percentage
+   * Disposal recommendation
+5. Use the “Classify Another Image” option to test additional samples
 
 ---
 
-## Application Use Cases
+## Applications
 
 * Smart waste segregation systems
 * IoT-enabled smart bins
 * Urban waste monitoring platforms
 * Environmental awareness tools
-* Educational and research demonstrations
-
----
-
-## Technology Stack
-
-* Python
-* TensorFlow / Keras or PyTorch
-* React / Web Interface
-* Tailwind / Modern UI Design
-* Deep Learning (CNN + Transfer Learning)
+* Academic and research demonstrations
 
 ---
 
 ## Future Enhancements
 
-* Food waste and organic waste expansion
-* Real-time camera detection
-* IoT smart bin integration
-* Waste level prediction and analytics dashboard
-* Cloud deployment
+* Addition of food and organic waste categories
+* Real-time object detection using camera
+* IoT sensor integration for smart bins
+* Waste level monitoring and analytics dashboard
+* Cloud deployment for large-scale use
 
 ---
 
 ## Project Goal
 
-To support sustainable waste management by combining Artificial Intelligence and IoT concepts for accurate waste identification, efficient segregation, and smarter urban environmental solutions.
+To develop an AI-powered waste classification system that improves segregation accuracy and supports sustainable urban waste management by integrating Artificial Intelligence and IoT technologies.
 
 ---
+

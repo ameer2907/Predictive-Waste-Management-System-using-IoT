@@ -1,73 +1,146 @@
-# Welcome to your Lovable project
+# AI-Driven Predictive Waste Management System
 
-## Project info
+An intelligent waste classification system that uses Deep Learning to automatically identify waste type and suggest the correct disposal method. This project supports urban sustainability by helping users segregate waste into biodegradable, recyclable, and general waste categories.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+---
 
-## How can I edit this code?
+## Overview
 
-There are several ways of editing your application.
+This system classifies waste images into three main categories:
 
-**Use Lovable**
+* **Biodegradable** – Organic waste that decomposes naturally
+* **Non-Biodegradable (Recyclable)** – Materials that can be processed and reused
+* **Trash** – Mixed or non-recyclable waste requiring landfill or manual sorting
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+The model is trained using a custom dataset and optimized for fast, real-time predictions suitable for demo and practical applications.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## Classification Logic
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Biodegradable (Green Bin)
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Includes:
 
-Follow these steps:
+* Paper
+* Cardboard
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Suggested Action: Compost / Organic Waste Disposal
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Non-Biodegradable (Recycling Bin)
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+Includes:
+
+* Plastic
+* Glass
+* Metal
+
+Suggested Action: Send to Recycling
+
+---
+
+### Trash (General Waste)
+
+Includes:
+
+* Mixed waste
+* Contaminated or non-recyclable items
+
+Suggested Action: General Waste / Landfill / Manual Sorting
+
+---
+
+## Dataset Structure
+
+```
+dataset/
+│
+├── biodegradable/
+│   ├── cardboard/
+│   └── paper/
+│
+├── non_biodegradable/
+│   ├── plastic/
+│   ├── glass/
+│   └── metal/
+│
+└── trash/
 ```
 
-**Edit a file directly in GitHub**
+Data augmentation techniques such as rotation, flipping, zooming, and brightness adjustment were used to improve model accuracy and generalization.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## Features
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+* AI-based image classification
+* Real-time prediction (fast inference)
+* Confidence score display
+* Disposal recommendation based on waste type
+* Upload image or capture via camera
+* “Classify Another Image” option for continuous testing
+* Professional dark navy user interface
+* Dashboard-ready architecture for IoT integration
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## Model Details
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+* Transfer Learning (MobileNetV2 / EfficientNet / ResNet)
+* Image preprocessing and normalization
+* Class balancing and augmentation
+* Optimized for high accuracy and demo performance
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+## User Workflow
 
-## Can I connect a custom domain to my Lovable project?
+1. Open the Classification page
+2. Upload or capture a waste image
+3. The system analyzes the image
+4. Displays:
 
-Yes, you can!
+   * Predicted Category
+   * Confidence Percentage
+   * Disposal Recommendation
+5. Click **Classify Another Image** to test more samples
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+---
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+## Application Use Cases
+
+* Smart waste segregation systems
+* IoT-enabled smart bins
+* Urban waste monitoring platforms
+* Environmental awareness tools
+* Educational and research demonstrations
+
+---
+
+## Technology Stack
+
+* Python
+* TensorFlow / Keras or PyTorch
+* React / Web Interface
+* Tailwind / Modern UI Design
+* Deep Learning (CNN + Transfer Learning)
+
+---
+
+## Future Enhancements
+
+* Food waste and organic waste expansion
+* Real-time camera detection
+* IoT smart bin integration
+* Waste level prediction and analytics dashboard
+* Cloud deployment
+
+---
+
+## Project Goal
+
+To support sustainable waste management by combining Artificial Intelligence and IoT concepts for accurate waste identification, efficient segregation, and smarter urban environmental solutions.
+
+---

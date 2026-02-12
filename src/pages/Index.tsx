@@ -5,11 +5,13 @@ import { DashboardTab } from '@/components/dashboard/DashboardTab';
 import { ClassifyTab } from '@/components/classification/ClassifyTab';
 import { HardwareOverview } from '@/components/hardware/HardwareOverview';
 import { ReportsPanel } from '@/components/reports/ReportsPanel';
+import { WiFiSetupPanel } from '@/components/wifi/WiFiSetupPanel';
 
 const TAB_TITLES: Record<string, { title: string; subtitle: string }> = {
   home: { title: '', subtitle: '' },
   dashboard: { title: 'Dashboard', subtitle: 'Real-time analytics and environmental impact' },
   classify: { title: 'Image Classification', subtitle: 'Upload and classify waste images' },
+  wifi: { title: 'WiFi / Hardware Setup', subtitle: 'Connect ESP32-CAM to the AI classification system' },
   hardware: { title: '3D Hardware Model', subtitle: 'Interactive smart bin system architecture' },
   reports: { title: 'Reports', subtitle: 'Export data and summaries' },
 };
@@ -23,6 +25,7 @@ const Index = () => {
       case 'home': return <HomePage onNavigate={setActiveTab} />;
       case 'dashboard': return <DashboardTab />;
       case 'classify': return <ClassifyTab />;
+      case 'wifi': return <WiFiSetupPanel />;
       case 'hardware': return <HardwareOverview />;
       case 'reports': return <ReportsPanel />;
       default: return null;

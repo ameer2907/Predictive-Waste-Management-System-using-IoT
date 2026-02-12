@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { 
   Recycle, Leaf, AlertTriangle, CheckCircle2, XCircle, Info, 
-  Sparkles, Shield, Zap, ArrowRightLeft, Clock
+  Sparkles, Shield, Zap, ArrowRightLeft, Clock, Trash2
 } from 'lucide-react';
 import { ClassificationResult as ClassificationResultType, WASTE_CATEGORIES } from '@/lib/waste-categories';
 import { cn } from '@/lib/utils';
@@ -10,14 +10,26 @@ interface ClassificationResultProps {
   result: ClassificationResultType;
 }
 
+function getDisposalInfo(category: string) {
+  switch (category) {
+    case 'Biodegradable':
+      return { message: 'Dispose in Green Bin', color: 'text-success', bg: 'bg-success/10 border-success/30', icon: Leaf };
+    case 'Non-Biodegradable':
+      return { message: 'Dispose in Recycling / Non-Bio Bin', color: 'text-primary', bg: 'bg-primary/10 border-primary/30', icon: Recycle };
+    default:
+      return { message: 'Mixed Waste – Manual Sorting Needed', color: 'text-warning', bg: 'bg-warning/10 border-warning/30', icon: Trash2 };
+  }
+}
+
 export function ClassificationResult({ result }: ClassificationResultProps) {
   const category = WASTE_CATEGORIES.find(
     c => c.name.toLowerCase() === result.primary_category.toLowerCase()
-  ) || WASTE_CATEGORIES[7];
+  ) || WASTE_CATEGORIES[2];
 
   const confidencePercent = result.confidence * 100;
   const isUncertain = confidencePercent < 60;
   const isHighConfidence = confidencePercent >= 90;
+  const disposal = getDisposalInfo(result.primary_category);
 
   const servoAction = result.servo_action || (result.is_recyclable ? 'RECYCLABLE' : 'NON_RECYCLABLE');
   const servoColor = servoAction === 'RECYCLABLE' ? 'text-success' : servoAction === 'NON_RECYCLABLE' ? 'text-destructive' : 'text-warning';
@@ -29,6 +41,16 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
       animate={{ opacity: 1, y: 0 }}
       className="space-y-4"
     >
+      {/* Disposal Action Banner */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className={cn("p-4 rounded-xl border flex items-center gap-3", disposal.bg)}
+      >
+        <disposal.icon className={cn("w-6 h-6 shrink-0", disposal.color)} />
+        <p className={cn("font-bold text-base", disposal.color)}>{disposal.message}</p>
+      </motion.div>
+
       {/* Uncertainty Warning */}
       {isUncertain && (
         <motion.div 
@@ -39,9 +61,9 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
           <div className="flex items-center gap-3">
             <AlertTriangle className="w-5 h-5 text-warning shrink-0" />
             <div>
-              <p className="font-semibold text-warning text-sm">Uncertain – Please try a clearer image</p>
+              <p className="font-semibold text-warning text-sm">Low Confidence – Try a clearer image</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Confidence is below 60%. A clearer, well-lit photo will improve accuracy.
+                Confidence is below 60%. A well-lit, clear photo will improve accuracy.
               </p>
             </div>
           </div>
@@ -106,7 +128,7 @@ export function ClassificationResult({ result }: ClassificationResultProps) {
             </div>
           </div>
 
-          {/* Inference time + Servo action inline */}
+          {/* Inference time + Servo action */}
           <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border/30">
             <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
               <Clock className="w-3.5 h-3.5" />

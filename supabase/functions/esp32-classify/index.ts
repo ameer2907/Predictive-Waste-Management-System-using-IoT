@@ -6,8 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
-const RECYCLABLE_CATEGORIES = ['Plastic', 'Paper', 'Glass', 'Metal', 'E-waste'];
-
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -49,7 +47,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `Classify waste into: Plastic, Paper, Glass, Metal, Organic, E-waste, Hazardous, Mixed/Non-recyclable. Return JSON: {"category":"...","confidence":0.95,"is_recyclable":true}`
+            content: `Classify waste into: Biodegradable, Non-Biodegradable, Trash. Mapping: cardboard/paper→Biodegradable, plastic/glass/metal→Non-Biodegradable, mixed/unknown→Trash. Return JSON: {"category":"...","confidence":0.95,"is_recyclable":true}`
           },
           {
             role: "user",
@@ -82,17 +80,16 @@ serve(async (req) => {
       const jsonMatch = content.match(/```json\s*([\s\S]*?)\s*```/) || content.match(/\{[\s\S]*\}/);
       classification = JSON.parse(jsonMatch ? (jsonMatch[1] || jsonMatch[0]) : content);
     } catch {
-      classification = { category: "Mixed/Non-recyclable", confidence: 0.3, is_recyclable: false };
+      classification = { category: "Trash", confidence: 0.3, is_recyclable: false };
     }
 
     const confidence = classification.confidence || 0;
-    const category = classification.category || "Mixed/Non-recyclable";
-    const isRecyclable = RECYCLABLE_CATEGORIES.includes(category);
+    const category = classification.category || "Trash";
 
     let servo: string;
     if (confidence < 0.5) {
       servo = 'UNCERTAIN';
-    } else if (isRecyclable) {
+    } else if (category === 'Biodegradable' || category === 'Non-Biodegradable') {
       servo = 'RECYCLABLE';
     } else {
       servo = 'NON_RECYCLABLE';

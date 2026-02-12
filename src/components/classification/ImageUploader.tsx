@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Camera, Image, X, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, Camera, Image, X, Loader2, AlertCircle, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useWasteClassification } from '@/hooks/use-waste-classification';
 import { ClassificationResult } from './ClassificationResult';
@@ -44,7 +44,6 @@ export function ImageUploader() {
     };
     reader.readAsDataURL(file);
     
-    // Auto-classify immediately after upload
     await classifyImage(file);
   };
 
@@ -83,6 +82,7 @@ export function ImageUploader() {
             <input
               type="file"
               accept="image/*"
+              capture="environment"
               onChange={handleInputChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
@@ -103,14 +103,14 @@ export function ImageUploader() {
                   {dragActive ? "Drop your image here" : "Upload waste image"}
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Drag and drop or click to browse
+                  Drag and drop, click to browse, or use camera
                 </p>
                 <p className="text-xs text-muted-foreground mt-2">
                   Supports JPG, PNG, WEBP up to 10MB
                 </p>
               </div>
 
-              <div className="flex items-center justify-center pt-4">
+              <div className="flex items-center justify-center gap-3 pt-4">
                 <Button variant="outline" className="gap-2">
                   <Image className="w-4 h-4" />
                   Browse Files
@@ -148,14 +148,13 @@ export function ImageUploader() {
                       <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto" />
                       <p className="text-sm font-medium">Analyzing waste image...</p>
                       <p className="text-xs text-muted-foreground">
-                        Running EfficientNet-B4 + Vision Transformer ensemble
+                        Running AI classification model
                       </p>
                     </div>
                   </div>
                 )}
               </div>
 
-              {/* File Info */}
               {selectedFile && (
                 <div className="mt-4 text-sm text-muted-foreground">
                   {selectedFile.name}
@@ -164,7 +163,26 @@ export function ImageUploader() {
             </div>
 
             {/* Results */}
-            {result && <ClassificationResult result={result} />}
+            {result && (
+              <>
+                <ClassificationResult result={result} />
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 }}
+                  className="flex justify-center"
+                >
+                  <Button 
+                    onClick={handleReset}
+                    size="lg"
+                    className="gap-2 px-8"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                    Classify Another Image
+                  </Button>
+                </motion.div>
+              </>
+            )}
 
             {error && (
               <motion.div
@@ -179,6 +197,15 @@ export function ImageUploader() {
                     <p className="text-sm text-muted-foreground">{error}</p>
                   </div>
                 </div>
+                <Button 
+                  onClick={handleReset}
+                  variant="outline"
+                  size="sm"
+                  className="mt-3 gap-2"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  Try Again
+                </Button>
               </motion.div>
             )}
           </motion.div>
